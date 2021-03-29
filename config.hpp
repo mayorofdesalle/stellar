@@ -3,7 +3,7 @@ static const int WINDOW_X{1024};
 static const int WINDOW_Y{768};
 
 // AMOUNT OF STARS
-static const int STARMAP_SIZE {1000};
+static const int STARMAP_SIZE {2000};
 
 // COLOR PALETTE
 static const std::vector<sf::Color> PALETTE {

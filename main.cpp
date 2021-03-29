@@ -4,8 +4,12 @@ bool adjust_color(sf::Color &color, const sf::Color &target);
 
 int main ()
 {   
-    sf::RenderWindow window(sf::VideoMode(WINDOW_X, WINDOW_Y), "ARP 87");
+    sf::RenderWindow window {sf::VideoMode(WINDOW_X, WINDOW_Y), "ARP 87"};
     window.setFramerateLimit(60);
+
+    sf::Image icon;
+    icon.loadFromFile("res/icon.png");
+    window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
 
     size_t next_color {1}; // palette index
     sf::Color galaxy_color = PALETTE[0]; // current color
