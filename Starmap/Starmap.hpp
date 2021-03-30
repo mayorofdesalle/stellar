@@ -27,10 +27,10 @@ class Starmap {
 		std::uniform_real_distribution<double> dist_p;
 
 		std::vector<Star> stars;
-		std::vector<sf::Color> palette;
+		const std::vector<sf::Color> &palette;
 
 	public:
-		Starmap(const int sm_size, const int w_x, const int w_y, const std::vector<sf::Color> palette);
+		Starmap(const int sm_size, const int w_x, const int w_y, const std::vector<sf::Color> &palette);
 		~Starmap() = default;
 		void update(const sf::RenderWindow &window, const double &speed);
 		void render(sf::RenderWindow &window, const double &speed);

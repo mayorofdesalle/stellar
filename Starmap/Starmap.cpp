@@ -10,7 +10,7 @@ Starmap::Star::Star(double x, double y, double z, int p)
         body.setPointCount(p);
     }
 
-Starmap::Starmap(const int sm_size, const int w_x, const int w_y, const std::vector<sf::Color> palette)
+Starmap::Starmap(const int sm_size, const int w_x, const int w_y, const std::vector<sf::Color> &palette)
     // Starmap Constructor
     :   stars{static_cast<size_t>(sm_size)}, 
         rd{std::random_device{}()},
