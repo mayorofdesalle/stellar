@@ -5,3 +5,7 @@ Made while learning SFML.
 - When you are lost in space, never look back.
 
 ![alt text](https://github.com/schismic/stellar/blob/main/bin/res/stellar.gif "warping")
+
+## Controls
+↑: Accelerate
+↓: Decelerate
