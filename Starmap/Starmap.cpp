@@ -37,11 +37,12 @@ void Starmap::update(const sf::RenderWindow &window, const double &speed)
         for (auto &s : stars) {
             // Warp
             s.z -= speed;
-            if (s.z <= 1) {
+
+            if (s.z <= 0) {
                 // Redraw star within boundaries
                 s.x = dist_x(rd);
                 s.y = dist_y(rd);
-                s.z = window.getSize().x;
+                s.z += window.getSize().x;
 
                 // Color star white/random color
                 c = static_cast<int>(dist_z(rd));
