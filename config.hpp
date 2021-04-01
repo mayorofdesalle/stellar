@@ -1,8 +1,8 @@
 const double PI {3.14159265358979323846};
 
-// WINDOW DIMENSIONs
-const int WINDOW_X{1024};
-const int WINDOW_Y{768};
+// WINDOW DIMENSIONS
+const int WINDOW_X{1024}; //! DO NOT CHANGE
+const int WINDOW_Y{768}; //! DO NOT CHANGE
 
 // AMOUNT OF STARS
 const int STARMAP_SIZE {2000};

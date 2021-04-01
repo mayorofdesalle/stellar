@@ -113,8 +113,4 @@ void Starmap::render(sf::RenderWindow &window, const double &velocity, const dou
             window.draw(s.body);
             window.draw(s.trail);
         }
-       /*  window.draw(stars.at(7).body);
-        window.draw(stars.at(7).trail);
-        std::cout << stars.at(7).x << " " << stars.at(7).y << " " << stars.at(7).z << " ";
-        std::cout << std::sqrt(std::pow(stars.at(7).x, 2) + std::pow(stars.at(7).y, 2)) << std::endl; */
     }

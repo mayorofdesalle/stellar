@@ -2,8 +2,8 @@
 
 bool adjust_color(sf::Color &color, const sf::Color &target);
 void update_velocity(double &velocity);
-void update_rotation(double &rotation);
-void update_direction(double &direction);
+void update_rotation(double &rotation, sf::IntRect &interior);
+void update_direction(double &direction, sf::IntRect &interior);
 
 int main ()
 {   
@@ -12,8 +12,22 @@ int main ()
     window.setFramerateLimit(60);
 
     sf::Image icon;
-    icon.loadFromFile("res/icon.png");
+    icon.loadFromFile("res/icon.ico");
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
+
+    sf::Texture ship_texture;
+    ship_texture.loadFromFile("res/ship3.png");
+    ship_texture.setSmooth(true);
+    sf::Sprite ship;
+    ship.setTexture(ship_texture);
+    sf::IntRect interior {
+                        (static_cast<int>(ship_texture.getSize().x) - WINDOW_X)/2,
+                        (static_cast<int>(ship_texture.getSize().y) - WINDOW_Y)/2,
+                        WINDOW_X,
+                        WINDOW_Y
+                        };
+    ship.setTextureRect(interior);
+    double scale;
 
     size_t next_color {1}; // palette index
     sf::Color galaxy_color = PALETTE[0]; // current color
@@ -32,9 +46,9 @@ int main ()
         }
 
         // Handle input
-        update_direction(direction);
         update_velocity(velocity);
-        update_rotation(rotation);
+        update_rotation(rotation, interior);
+        update_direction(direction, interior);
         
         // Calculate distance traveled
         sf::Time time = clock.restart();
@@ -48,9 +62,20 @@ int main ()
                 next_color = (next_color + 1) % PALETTE.size();
         }
 
+        // Update the ship sprite
+        scale = 1 - velocity/MAX_VELOCITY * MIN_VELOCITY;
+        if (interior.height * (2-scale) < ship_texture.getSize().y &&
+            interior.width * (2-scale) < ship_texture.getSize().x) {
+                ship.setScale(scale, scale);
+                interior.width *= (2-scale);
+                interior.height *= (2-scale);
+            }
+        ship.setTextureRect(interior);
+
         // Render and display
         window.clear(galaxy_color);
         starmap.render(window, velocity, rotation, direction);
+        window.draw(ship);
         window.display();
     }
 }
@@ -67,43 +92,65 @@ bool adjust_color(sf::Color &color, const sf::Color &next_color)
         return (color == next_color) ? true : false;
     }
 
-void update_velocity(double &velocity) {
+void update_velocity(double &velocity)
+    {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) && velocity <= MAX_VELOCITY) {
             velocity += THRUST + ACCELERATION;
         }
         else if (velocity > MIN_VELOCITY) {
-            velocity -= (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) ? THRUST + ACCELERATION : 2 * THRUST;
+            velocity -= (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) ? THRUST + ACCELERATION : 3 * THRUST;
         }
         else
             velocity = MIN_VELOCITY;
-}
-
-void update_rotation(double &rotation) {
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && std::fabs(rotation) <= MAX_ROTATION)
-        rotation += ROTATION;
-    else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && std::fabs(rotation) <= MAX_ROTATION)
-        rotation -= ROTATION;
-    else {
-        if (rotation > ROTATION)
-            rotation -= ROTATION;
-        else if (rotation < -ROTATION)
-            rotation += ROTATION;
-        else
-            rotation = 0;
+        
     }
-}
 
-void update_direction(double &direction) {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && std::fabs(direction) <= MAX_DIRECTION)
-            direction += DIRECTION + ACCELERATION;
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && std::fabs(direction) <= MAX_DIRECTION) 
-            direction -= DIRECTION + ACCELERATION;
-        else {
-            if (direction > ACCELERATION)
-                direction -= ACCELERATION;
-            else if (direction < -ACCELERATION)
-                direction += ACCELERATION;
-            else
-                direction = 0;
+void update_rotation(double &rotation, sf::IntRect &interior)
+    {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && std::fabs(rotation) <= MAX_ROTATION) {
+            rotation += ROTATION;
+            interior.left += ROTATION;
+        }  
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right) && std::fabs(rotation) <= MAX_ROTATION) {
+            rotation -= ROTATION;
+            interior.left -= ROTATION;
         }
-}
+        else {
+            if (rotation > ROTATION) {
+                rotation -= ROTATION;
+                interior.left -= ROTATION;
+            }
+            else if (rotation < -ROTATION) {
+                rotation += ROTATION;
+                interior.left += ROTATION;
+            }
+            else {
+                rotation = 0;
+            }
+        }
+    }
+
+void update_direction(double &direction, sf::IntRect &interior)
+    {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && std::fabs(direction) <= MAX_DIRECTION) {
+            direction += DIRECTION;
+            interior.top += MAX_DIRECTION;
+        }
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && std::fabs(direction) <= MAX_DIRECTION) {
+            direction -= DIRECTION;
+            interior.top -= MAX_DIRECTION;
+        }
+        else {
+            if (direction > DIRECTION) {
+                direction -= DIRECTION;
+                interior.top -= MAX_DIRECTION;
+            }
+            else if (direction < -DIRECTION) {
+                direction += DIRECTION;
+                interior.top += MAX_DIRECTION;
+            }
+            else {
+                direction = 0;
+            }
+        }
+    }
