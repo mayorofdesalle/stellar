@@ -7,6 +7,7 @@
 #include "../config.hpp"
 #include <random>
 #include <vector>
+#include <cmath>
 
 class Starmap {
 	private:
@@ -32,8 +33,8 @@ class Starmap {
 	public:
 		Starmap(const int sm_size, const int w_x, const int w_y, const std::vector<sf::Color> &palette);
 		~Starmap() = default;
-		void update(const sf::RenderWindow &window, const double &speed);
-		void render(sf::RenderWindow &window, const double &speed);
+		void update(const sf::RenderWindow &window, const double &velocity, const double &rotation, const double &direction);
+		void render(sf::RenderWindow &window, const double &velocity, const double &rotation, const double &direction);
 };
 
 #endif

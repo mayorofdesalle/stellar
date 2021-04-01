@@ -30,20 +30,48 @@ Starmap::Starmap(const int sm_size, const int w_x, const int w_y, const std::vec
         }
     }
 
-void Starmap::update(const sf::RenderWindow &window, const double &speed)
+void Starmap::update(const sf::RenderWindow &window, const double &velocity, const double &rotation, const double &direction)
     // Update position, bodies and trails of the stars
     {
         size_t c;
-        for (auto &s : stars) {
-            // Warp
-            s.z -= speed;
+        sf::Transform transform;
+        transform.rotate(rotation * PI / 180.0, 0, 0);
 
-            if (s.z <= 0) {
+        for (auto &s : stars) {
+            // Rotate
+            sf::Vector2f rotated_pos = transform.transformPoint(s.x, s.y);
+            s.x = rotated_pos.x;
+            s.y = rotated_pos.y;
+            // Direct
+            s.y -= direction;
+            // Warp
+            s.z -= velocity;
+
+            bool color {false};
+
+            if (s.z < 0) {
                 // Redraw star within boundaries
                 s.x = dist_x(rd);
                 s.y = dist_y(rd);
-                s.z += window.getSize().x;
+                s.z += window.getSize().x; 
+                color = true;
+            }
+            else if (s.x < -s.z || s.x > s.z) {
+                // Redraw star out of view
+                s.x += (s.x < -s.z) ? 1.5 * s.z + rotation : -1.5 * s.z - rotation;
+                s.z = dist_z(rd);
+                s.y = dist_y(rd);
+                color = true;
+            }
+            else if (s.y < -s.z || s.y > s.z) {
+                // Redraw star out of view
+                s.y += (s.y < -s.z) ? 1.5 * s.z + direction : -1.5 * s.z - direction;
+                s.z = dist_z(rd);
+                s.x = dist_x(rd);
+                color = true;
+            }
 
+            if (color) {
                 // Color star white/random color
                 c = static_cast<int>(dist_z(rd));
                 if (c%2 == 0) {
@@ -54,19 +82,19 @@ void Starmap::update(const sf::RenderWindow &window, const double &speed)
                 else
                     s.body.setFillColor(sf::Color::White);
             }
-            
+
             // Handle next position
             double nx {(s.x * window.getSize().x / s.z) + window.getSize().x/2};
             double ny {(s.y * window.getSize().y / s.z) + window.getSize().y/2};
             s.body.setPosition(sf::Vector2f(nx, ny));
             // Adjust radius relative to z
-            s.body.setRadius((window.getSize().x-s.z)/200);
+            s.body.setRadius((window.getSize().x-s.z)*RADII/window.getSize().x);
             // Update origin
             s.body.setOrigin(s.body.getRadius(), s.body.getRadius());
 
             // Handle trail position
-            double tx {(s.x * window.getSize().x / (s.z + speed * trail_length)) + window.getSize().x/2};
-            double ty {(s.y * window.getSize().y / (s.z + speed * trail_length)) + window.getSize().y/2};
+            double tx {(s.x * window.getSize().x / (s.z + velocity * TRAIL_LENGTH)) + window.getSize().x/2};
+            double ty {((s.y + TRAIL_LENGTH * direction) * window.getSize().y / (s.z + velocity * TRAIL_LENGTH)) +  window.getSize().y/2};
             s.trail[0] = sf::Vertex(sf::Vector2f(tx, ty));
             s.trail[1] = sf::Vertex(sf::Vector2f(nx, ny));
             // Color trail
@@ -77,12 +105,16 @@ void Starmap::update(const sf::RenderWindow &window, const double &speed)
         }
     }
 
-void Starmap::render(sf::RenderWindow &window, const double &speed)
+void Starmap::render(sf::RenderWindow &window, const double &velocity, const double &rotation, const double &direction)
     // Render the stars
-    {
-        update(window, speed);
-        for (auto &s : stars) {
+    {   
+        update(window, velocity, rotation, direction);
+        for (auto &s: stars) {
             window.draw(s.body);
             window.draw(s.trail);
         }
+       /*  window.draw(stars.at(7).body);
+        window.draw(stars.at(7).trail);
+        std::cout << stars.at(7).x << " " << stars.at(7).y << " " << stars.at(7).z << " ";
+        std::cout << std::sqrt(std::pow(stars.at(7).x, 2) + std::pow(stars.at(7).y, 2)) << std::endl; */
     }
