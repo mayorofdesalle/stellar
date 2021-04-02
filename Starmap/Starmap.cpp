@@ -30,20 +30,20 @@ Starmap::Starmap(const int sm_size, const int w_x, const int w_y, const std::vec
         }
     }
 
-void Starmap::update(const sf::RenderWindow &window, const double &velocity, const double &rotation, const double &direction)
+void Starmap::update(const sf::RenderWindow &window, const double &velocity, const double &rotation, const double &tilt)
     // Update position, bodies and trails of the stars
     {
         size_t c;
         sf::Transform transform;
         transform.rotate(rotation * PI / 180.0, 0, 0);
-
+        sf::Vector2f rotated_pos;
         for (auto &s : stars) {
             // Rotate
-            sf::Vector2f rotated_pos = transform.transformPoint(s.x, s.y);
+            rotated_pos = transform.transformPoint(s.x, s.y);
             s.x = rotated_pos.x;
             s.y = rotated_pos.y;
             // Direct
-            s.y -= direction;
+            s.y -= tilt;
             // Warp
             s.z -= velocity;
 
@@ -65,7 +65,7 @@ void Starmap::update(const sf::RenderWindow &window, const double &velocity, con
             }
             else if (s.y < -s.z || s.y > s.z) {
                 // Redraw star out of view
-                s.y += (s.y < -s.z) ? 1.5 * s.z + direction : -1.5 * s.z - direction;
+                s.y += (s.y < -s.z) ? 1.5 * s.z + tilt : -1.5 * s.z - tilt;
                 s.z = dist_z(rd);
                 s.x = dist_x(rd);
                 color = true;
@@ -94,7 +94,7 @@ void Starmap::update(const sf::RenderWindow &window, const double &velocity, con
 
             // Handle trail position
             double tx {(s.x * window.getSize().x / (s.z + velocity * TRAIL_LENGTH)) + window.getSize().x/2};
-            double ty {((s.y + TRAIL_LENGTH * direction) * window.getSize().y / (s.z + velocity * TRAIL_LENGTH)) +  window.getSize().y/2};
+            double ty {((s.y + tilt * velocity) * window.getSize().y / (s.z + velocity * TRAIL_LENGTH)) +  window.getSize().y/2};
             s.trail[0] = sf::Vertex(sf::Vector2f(tx, ty));
             s.trail[1] = sf::Vertex(sf::Vector2f(nx, ny));
             // Color trail
@@ -105,10 +105,10 @@ void Starmap::update(const sf::RenderWindow &window, const double &velocity, con
         }
     }
 
-void Starmap::render(sf::RenderWindow &window, const double &velocity, const double &rotation, const double &direction)
+void Starmap::render(sf::RenderWindow &window, const double &velocity, const double &rotation, const double &tilt)
     // Render the stars
     {   
-        update(window, velocity, rotation, direction);
+        update(window, velocity, rotation, tilt);
         for (auto &s: stars) {
             window.draw(s.body);
             window.draw(s.trail);

@@ -27,13 +27,13 @@ const double ACCELERATION {0.05};
 const double THRUST {0.1};
 double velocity {1};
 
-// ROTATION, DIRECTION AND COEFFICIENTS
+// ROTATION, TILT AND COEFFICIENTS
 const double ROTATION {1};
 const double MAX_ROTATION {100*ROTATION};
 double rotation {0};
-const double DIRECTION {0.01};
-const double MAX_DIRECTION {100*DIRECTION};
-double direction {0};
+const double TILT {0.01};
+const double MAX_TILT {100*TILT};
+double tilt {0};
 
 // TRAIL LENGTH COEFFICIENT
 const double TRAIL_LENGTH {5};

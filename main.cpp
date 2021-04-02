@@ -1,22 +1,25 @@
 #include "Starmap/Starmap.hpp"
-
+#include <iostream>
 bool adjust_color(sf::Color &color, const sf::Color &target);
 void update_velocity(double &velocity);
 void update_rotation(double &rotation, sf::IntRect &interior);
-void update_direction(double &direction, sf::IntRect &interior);
+void update_tilt(double &tilt, sf::IntRect &interior);
 
 int main ()
 {   
-    sf::RenderWindow window {sf::VideoMode(WINDOW_X, WINDOW_Y), "ARP 87"};
+    // Window
+    sf::RenderWindow window {sf::VideoMode(WINDOW_X, WINDOW_Y), "Stellar"};
     window.setMouseCursorVisible(false);
     window.setFramerateLimit(60);
 
+    // Executable icon
     sf::Image icon;
     icon.loadFromFile("res/icon.ico");
     window.setIcon(icon.getSize().x, icon.getSize().y, icon.getPixelsPtr());
-
+    
+    // Spaceship sprite
     sf::Texture ship_texture;
-    ship_texture.loadFromFile("res/ship3.png");
+    ship_texture.loadFromFile("res/ship.png");
     ship_texture.setSmooth(true);
     sf::Sprite ship;
     ship.setTexture(ship_texture);
@@ -26,13 +29,10 @@ int main ()
                         WINDOW_X,
                         WINDOW_Y
                         };
-    ship.setTextureRect(interior);
-    double scale;
 
     size_t next_color {1}; // palette index
     sf::Color galaxy_color = PALETTE[0]; // current color
     Starmap starmap {STARMAP_SIZE, WINDOW_X, WINDOW_Y, PALETTE};
-
     sf::Clock clock;
 
     while (window.isOpen())
@@ -48,7 +48,7 @@ int main ()
         // Handle input
         update_velocity(velocity);
         update_rotation(rotation, interior);
-        update_direction(direction, interior);
+        update_tilt(tilt, interior);
         
         // Calculate distance traveled
         sf::Time time = clock.restart();
@@ -63,18 +63,11 @@ int main ()
         }
 
         // Update the ship sprite
-        scale = 1 - velocity/MAX_VELOCITY * MIN_VELOCITY;
-        if (interior.height * (2-scale) < ship_texture.getSize().y &&
-            interior.width * (2-scale) < ship_texture.getSize().x) {
-                ship.setScale(scale, scale);
-                interior.width *= (2-scale);
-                interior.height *= (2-scale);
-            }
         ship.setTextureRect(interior);
-
+        
         // Render and display
         window.clear(galaxy_color);
-        starmap.render(window, velocity, rotation, direction);
+        starmap.render(window, velocity, rotation, tilt);
         window.draw(ship);
         window.display();
     }
@@ -93,12 +86,13 @@ bool adjust_color(sf::Color &color, const sf::Color &next_color)
     }
 
 void update_velocity(double &velocity)
+    // Check for input and update velocity accordingly
     {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::W) && velocity <= MAX_VELOCITY) {
             velocity += THRUST + ACCELERATION;
         }
         else if (velocity > MIN_VELOCITY) {
-            velocity -= (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) ? THRUST + ACCELERATION : 3 * THRUST;
+            velocity -= (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) ? ACCELERATION : THRUST + ACCELERATION;
         }
         else
             velocity = MIN_VELOCITY;
@@ -106,6 +100,7 @@ void update_velocity(double &velocity)
     }
 
 void update_rotation(double &rotation, sf::IntRect &interior)
+    // Check for input and update rotation and interior movement accordingly
     {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Left) && std::fabs(rotation) <= MAX_ROTATION) {
             rotation += ROTATION;
@@ -130,27 +125,28 @@ void update_rotation(double &rotation, sf::IntRect &interior)
         }
     }
 
-void update_direction(double &direction, sf::IntRect &interior)
+void update_tilt(double &tilt, sf::IntRect &interior)
+    // Check for input and update tilt and interior movement accordingly
     {
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && std::fabs(direction) <= MAX_DIRECTION) {
-            direction += DIRECTION;
-            interior.top += MAX_DIRECTION;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up) && std::fabs(tilt) <= MAX_TILT) {
+            tilt += TILT;
+            interior.top -= MAX_TILT;
         }
-        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && std::fabs(direction) <= MAX_DIRECTION) {
-            direction -= DIRECTION;
-            interior.top -= MAX_DIRECTION;
+        else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Down) && std::fabs(tilt) <= MAX_TILT) {
+            tilt -= TILT;
+            interior.top += MAX_TILT;
         }
         else {
-            if (direction > DIRECTION) {
-                direction -= DIRECTION;
-                interior.top -= MAX_DIRECTION;
+            if (tilt > TILT) {
+                tilt -= TILT;
+                interior.top += MAX_TILT;
             }
-            else if (direction < -DIRECTION) {
-                direction += DIRECTION;
-                interior.top += MAX_DIRECTION;
+            else if (tilt < -TILT) {
+                tilt += TILT;
+                interior.top -= MAX_TILT;
             }
             else {
-                direction = 0;
+                tilt = 0;
             }
         }
     }
