@@ -84,6 +84,7 @@ bool adjust_color(sf::Color &color, const sf::Color &next_color)
             color.g += (color.g > next_color.g) ? -1 : 1;
         return (color == next_color) ? true : false;
     }
+    
 
 void update_velocity(double &velocity)
     // Check for input and update velocity accordingly
@@ -92,7 +93,7 @@ void update_velocity(double &velocity)
             velocity += THRUST + ACCELERATION;
         }
         else if (velocity > MIN_VELOCITY) {
-            velocity -= (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) ? ACCELERATION : THRUST + ACCELERATION;
+            velocity -= (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) ? (THRUST + ACCELERATION) : ACCELERATION;
         }
         else
             velocity = MIN_VELOCITY;
