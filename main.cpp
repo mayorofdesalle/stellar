@@ -1,5 +1,5 @@
 #include "Starmap/Starmap.hpp"
-#include <iostream>
+
 bool adjust_color(sf::Color &color, const sf::Color &target);
 void update_velocity(double &velocity);
 void update_rotation(double &rotation, sf::IntRect &interior);
