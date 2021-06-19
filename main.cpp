@@ -1,5 +1,5 @@
 #include "Starmap/Starmap.hpp"
-#include <iostream>
+
 bool adjust_color(sf::Color &color, const sf::Color &target);
 void update_velocity(double &velocity);
 void update_rotation(double &rotation, sf::IntRect &interior);
@@ -8,7 +8,7 @@ void update_tilt(double &tilt, sf::IntRect &interior);
 int main ()
 {   
     // Window
-    sf::RenderWindow window {sf::VideoMode(WINDOW_X, WINDOW_Y), "Stellar"};
+    sf::RenderWindow window {sf::VideoMode(WINDOW_X, WINDOW_Y), "Stellar", sf::Style::Titlebar | sf::Style::Close};
     window.setMouseCursorVisible(false);
     window.setFramerateLimit(60);
 
@@ -93,7 +93,7 @@ void update_velocity(double &velocity)
             velocity += THRUST + ACCELERATION;
         }
         else if (velocity > MIN_VELOCITY) {
-            velocity -= (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) ? (THRUST + ACCELERATION) : ACCELERATION;
+            velocity -= (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::S)) ? THRUST : 0;
         }
         else
             velocity = MIN_VELOCITY;
