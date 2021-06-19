@@ -1,3 +1,7 @@
+#ifndef CONFIG_HPP
+#define CONFIG_HPP
+#pragma once
+
 const double PI {3.14159265358979323846};
 
 // WINDOW DIMENSIONS
@@ -40,3 +44,5 @@ const double TRAIL_LENGTH {5};
 
 // DISTANCE BETWEEN COLORS
 double distance {2.5};
+
+#endif

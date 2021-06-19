@@ -1,5 +1,5 @@
-#ifndef STARMAP_H
-#define STARMAP_H
+#ifndef STARMAP_HPP
+#define STARMAP_HPP
 #pragma once
 
 #include <SFML/Graphics.hpp>
